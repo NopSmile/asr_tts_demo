@@ -1,122 +1,116 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	
-	<title>在线语音识别ASR服务</title>
-	<link rel="stylesheet" type="text/css" th:href="@{/ocr/lazy.css}">
-    <script type="text/javascript">
-        function Clear(){
-            document.getElementById("imageFile").value="";
-        }
-        function check() {
-            if(document.getElementById("imageFile").value==""){
-                alert("没有选择任何文件.");
-                return false;
-            }
-            return true;
-        }
-        if ( window.history.replaceState ) {
-            window.history.replaceState( null, null, window.location.href );
-        }
-
-    </script>
-
-
-    <script>
-        var socket;
-        if(typeof(WebSocket) == "undefined") {
-            console.log("您的浏览器不支持WebSocket");
-        }else{
-            console.log("您的浏览器支持WebSocket");
-            //实现化WebSocket对象，指定要连接的服务器地址与端口  建立连接
-            //等同于
-            //index = new WebSocket("ws://172.31.202.41:52220/ws/111");
-            index = new WebSocket("ws://192.168.60.79:52220/ws/111");
-            //socket = new WebSocket("${basePath}websocket/${cid}".replace("http","ws"));
-            //打开事件
-            index.onopen = function() {
-                console.log("Socket 已打开");
-                //socket.send("这是来自客户端的消息" + location.href + new Date());
-            };
-            //获得消息事件
-            index.onmessage = function(msg) {
-                console.log(msg.data);
-                //发现消息进入    开始处理前端触发逻辑
-                document.getElementById("txtAreaParsedResult").value=msg.data;
-            };
-            //关闭事件
-            index.onclose = function() {
-                console.log("Socket已关闭");
-            };
-            //发生了错误事件
-            index.onerror = function() {
-                alert("Socket发生了错误");
-                //此时可以尝试刷新页面
-            }
-            //离开页面时，关闭socket
-            //jquery1.8中已经被废弃，3.0中已经移除
-            // $(window).unload(function(){
-            //     socket.close();
-            //});
-        }
-    </script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能AI听写功能</title>
+    <link rel="stylesheet" type="text/css" href="styles/index.css">
+    <link rel="stylesheet" type="text/css" href="styles/element.css">
+    <script src="js/vue.js"></script>
+    <script src="js/element.js"></script>
 </head>
-<body style="">
-			<div class="row">
-				<div class="span12 whitebg">
-
-                    <img id="previewImage" class="img-responsive" style="float:left; height:20%; width:25%;margin-left:18px;margin-top:18px;" th:src="@{/ocr/pic/logo.png}" >
-					<h1 class="slogon">
-					</h1>
-					</div>
-				</div>
-		<form action="../" class="form-horizontal" enctype="multipart/form-data" id="ocrForm" method="post" novalidate="novalidate" onsubmit="return check()">
-			<!--<input name="__RequestVerificationToken" type="hidden" value="unknown">-->
-			<fieldset>
-        <div class="row">
-          <div class="span12">
-            <h3 class="headline">
-            <span>录音文件识别</span>
-            </h3>
-          </div>
-
-          <div class="span12">
-            <div class="span4">
-              <p class="diyLabel">上传语音文件</p>
+<body>
+    <div class="main" id="app">
+        <!-- 功能1 -->
+        <div class="title">录音识别</div>
+        <div class="cont">
+            <div class="left-box box">
+                <div class="box-title">语音录入</div>
+                <div class="box-cont"></div>
             </div>
-            <div class="span8">
-                <input type="file" name="file" id="imageFile" class="form-control choose" accept="audio/*">
+            <div class="right-box box">
+                <div class="box-title">识别结果</div>
+                <div class="box-cont"></div>
             </div>
-        	</div>
-          <div class="span12 thirdrow">
-            <div class="span4">
-                <p class="diyLabel">选择识别语言</p>
-            </div>
-            <div class="span4">
-              <select id="ocrLanguage" class="form-control valid selection">
-                <option value="chs" selected="selected">中文（简体）</option>
-              </select>
-            </div>
-
-            <!--<div class="span2" id="btnStartOCR"><a class="btn btn-large btn-green-light" onclick="StartOCR()">开始</a></div>-->
-            <div class="span2" id="btnStartOCR"><input type="submit" value="转写" class="btn btn-large btn-green-light"></div>
-            <div class="span2" id="btnCancel"><input type="button" class="btn btn-large btn-green-light" onclick="Clear()" value="重置"></div>
-          </div>
-
-            <div style=" clear:both; margin-top:10px !important;">上一次识别任务已完成,如没有结果请稍后重试-<a id="linka" th:href="@{${path}}" target="_blank" download="result.txt">-点击下载结果-</a></div>
-
-
-            <div id="resultPanel" class="span5 borderspan" >
-                <div class="resultarea">
-                    <h3>识别结果</h3>
-                </div>
-                <div>
-                    <textarea class="form-control" cols="20" id="txtAreaParsedResult" name="parsedResult" rows="2" style="height:202px; width:95%; margin-left:18px;" th:text="${result}" disabled></textarea>
-                    <!--<iframe class="form-control" cols="20" id="txtAreaParsedResult" name="parsedResult" rows="2" style="height:202px; width:95%; margin-left:18px;"  th:src="@{${path}}" disabled></iframe>-->
-                </div>
-            </div>
-          </div>
         </div>
-      </fieldset>
-	</form>
-  </div>
-	</body></html>
+
+        <!-- 功能2 -->
+        <div class="title">音频播放</div>
+        <div class="cont">
+            <div class="box">
+                <div class="box-title">示例文本</div>
+                <div class="box-cont"></div>
+            </div>
+            <div class="box">
+                <div class="box-title">场景</div>
+                <div class="box-cont">
+                    <div class="scene">
+                        <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
+                            <el-tab-pane label="通用" name="first">
+                                <div class="scene-cont">
+                                    <div :class=" sceneActive==item.cont?'active':''" class="scene-item"  v-for="(item, index) in sceneList" :key="index" @click="choseItem(item)">
+                                        <img :src="item.img" :alt="item.img"/>
+                                        <span class="name">{{item.cont}}</span>
+                                        <div class="icon">精品</div>
+                                    </div>
+                                </div>
+                            </el-tab-pane>
+                            <el-tab-pane label="客服" name="second"></el-tab-pane>
+                            <el-tab-pane label="英文" name="third"></el-tab-pane>
+                            <el-tab-pane label="童音" name="fourth"></el-tab-pane>
+                        </el-tabs>
+                    </div>
+                    <div class="set">
+                        <div class="set-box">
+                            <span class="set-title">音量</span>
+                            <el-progress :percentage="percentage1" :color="customColor"></el-progress>
+                        </div>
+                        <div class="set-box">
+                            <span class="set-title">语速</span>
+                            <el-progress :percentage="percentage2" :color="customColor"></el-progress>
+                        </div>
+                    </div>
+                    <div class="btn-box">
+                        <div class="btn">立即合成</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            percentage1: 20,
+            percentage2: 100,
+            customColor: '#ff6a00',
+            activeName: 'first',
+            sceneActive:'冰洁,女青年,中文',
+            sceneList:[
+                {
+                    img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
+                    cont:"冰洁,女青年,中文",
+                },
+                {
+                    img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
+                    cont:"虫虫,女青年,中文",
+                },{
+                    img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
+                    cont:"小康,女青年,中文",
+                },
+                {
+                    img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
+                    cont:"小雪,女青年,中文",
+                },
+                {
+                    img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
+                    cont:"小媛,女青年,中文",
+                },
+                {
+                    img:"https://img.alicdn.com/tfs/TB1Ek54DPTpK1RjSZKPXXa3UpXa-517-517.png",
+                    cont:"一峰,男青年,中文",
+                },
+            ]
+        },
+        methods: {
+            handleClick(tab, event) {
+                console.log(tab, event);
+            },
+            choseItem(item){
+                this.sceneActive = item.cont;
+            }
+        }
+    })
+</script>
+</html>
