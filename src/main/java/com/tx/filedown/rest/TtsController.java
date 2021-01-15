@@ -30,17 +30,6 @@ public class TtsController {
     @Value("${url}")
     private String URL;
 
-    @GetMapping("/")
-    public String uploladPage(Model model){
-        if(!"".equals(Constant.LASTRESULT)){
-            model.addAttribute("path",Constant.LASTRESULT);
-            model.addAttribute("result",Constant.STRRESULT);
-        }
-
-        return "index";
-    }
-
-
     private static void saveResp(String body) throws IOException {
         FileOutputStream out = new FileOutputStream("D:\\xf\\oo166.wav");
         String[] resultList = body.split("\n");
