@@ -28,7 +28,7 @@ import java.util.UUID;
 @Controller
 public class TtsController {
     @Value("${url}")
-    private int URL;
+    private String URL;
 
     @GetMapping("/")
     public String uploladPage(Model model){
