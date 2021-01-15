@@ -58,6 +58,83 @@ body{
 	padding: 10px;
 	background: #000;
 	box-sizing: border-box;
+	position: relative;
+}
+.bg{
+	width: 10px;
+	margin-right: 20px;
+	border-radius: 5px;
+	height: 100%;
+	display: inline-block;
+	background: #151616;
+}
+.bg-area{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	height: 136px;
+	width: 288px;
+	font-size: 0;
+}
+.bg1{
+	height: 36px;
+	transform: translateY(-50px);
+}
+.bg2{
+	height: 70px;
+	transform: translateY(-33px);
+}
+.bg4{
+	height: 96px;
+	transform: translateY(-20px);
+}
+.bg5{
+	height: 36px;
+	transform: translateY(-50px);
+}
+.bg6{
+	height: 56px;
+	transform: translateY(-40px);
+}
+.bg8{
+	height: 100px;
+	transform: translateY(-18px);
+}
+.bg9{
+	height: 36px;
+	transform: translateY(-50px);
+}
+.box-text{
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	color: #fff;
+	background: transparent;
+	border-color: transparent;
+	outline: none;
+	font-size: 16px;
+	line-height: 20px;
+	resize: none;
+}
+.box-input{
+	width: 160px;
+	position: absolute;
+	bottom: 100px;
+	left: 50%;
+	margin-left: -65px;
+	color: #fff;
+	font-size: 14px;
+}
+.box-tip{
+	position: absolute;
+	bottom: 50px;
+	left: 0;
+	right: 0;
+	line-height: 20px;
+	font-size: 14px;
+	color: #fff;
+	text-align: center;
 }
 .scene{
 	width: 100%;
@@ -149,8 +226,8 @@ body{
     color: #fff;
     margin: 10px;
 }
-.el-progress{
-	width: 88%;
+.el-slider{
+	width: 80%;
 }
 .btn-box{
 	width: 100%;

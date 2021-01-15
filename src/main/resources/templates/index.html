@@ -16,11 +16,27 @@
         <div class="cont">
             <div class="left-box box">
                 <div class="box-title">语音录入</div>
-                <div class="box-cont"></div>
+                <div class="box-cont">
+                    <input class="box-input" type="file" />
+                    <p class="box-tip">点击上传录音文件，可以识别录音内容。</p>
+                </div>
             </div>
             <div class="right-box box">
                 <div class="box-title">识别结果</div>
-                <div class="box-cont"></div>
+                <div class="box-cont">
+                    <div class="bg-area">
+                        <div class="bg bg1"></div>
+                        <div class="bg bg2"></div>
+                        <div class="bg bg3"></div>
+                        <div class="bg bg4"></div>
+                        <div class="bg bg5"></div>
+                        <div class="bg bg6"></div>
+                        <div class="bg bg7"></div>
+                        <div class="bg bg8"></div>
+                        <div class="bg bg9"></div>
+                    </div>
+                    <textarea class="box-text" style="position: relative"></textarea>
+                </div>
             </div>
         </div>
 
@@ -29,7 +45,9 @@
         <div class="cont">
             <div class="box">
                 <div class="box-title">示例文本</div>
-                <div class="box-cont"></div>
+                <div class="box-cont">
+                    <textarea class="box-text" style="position: relative" placeholder="请输入文字"></textarea>
+                </div>
             </div>
             <div class="box">
                 <div class="box-title">场景</div>
@@ -53,11 +71,11 @@
                     <div class="set">
                         <div class="set-box">
                             <span class="set-title">音量</span>
-                            <el-progress :percentage="percentage1" :color="customColor"></el-progress>
+                            <el-slider v-model="yinliang"></el-slider>
                         </div>
                         <div class="set-box">
                             <span class="set-title">语速</span>
-                            <el-progress :percentage="percentage2" :color="customColor"></el-progress>
+                            <el-slider v-model="yusu"></el-slider>
                         </div>
                     </div>
                     <div class="btn-box">
@@ -72,9 +90,8 @@
     var app = new Vue({
         el: '#app',
         data: {
-            percentage1: 20,
-            percentage2: 100,
-            customColor: '#ff6a00',
+            yinliang:-20,
+            yusu:0,
             activeName: 'first',
             sceneActive:'冰洁,女青年,中文',
             sceneList:[
