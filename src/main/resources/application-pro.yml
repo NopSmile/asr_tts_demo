@@ -35,3 +35,4 @@ file:
     path: D:\data\asrdata\
 
 asr: 0
+url: http://172.16.12.39:10011/createRec
