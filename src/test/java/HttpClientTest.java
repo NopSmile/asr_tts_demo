@@ -20,11 +20,12 @@ public class HttpClientTest {
     @Test
     public void testHttpClient() {
         final TtsParams params = new TtsParams("147258369", "yifeng");
-        params.setSpeed("-300");
+        params.setSpeed("300");
+        params.setVolume("20");
         //params.setSampleRate("8000");
         final RequestBodyJson bodyJson = new RequestBodyJson();
         bodyJson.sessionParam = convertParams(params);
-        bodyJson.text = "青年兴则国兴，青年强则国强";
+        bodyJson.text = "666666666666666666666666";
         try {
             final String resp = new OkHttpClient().newCall(new Request.Builder()
                     .url(URL)
