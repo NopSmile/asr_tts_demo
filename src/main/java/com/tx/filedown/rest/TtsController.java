@@ -5,6 +5,7 @@ import com.iflytek.vcp.voice.engine.tts.domain.TtsParams;
 import com.iflytek.vcp.voice.engine.tts.utils.WavUtils;
 import com.tx.filedown.common.utils.Constant;
 import com.tx.filedown.common.utils.KeyGenerator;
+import com.tx.filedown.common.utils.MapRestResponse;
 import com.tx.filedown.common.utils.Tools;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -27,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping("/tts")
 public class TtsController {
     @Value("${url}")
@@ -35,7 +36,7 @@ public class TtsController {
 
 
     @PostMapping("/go")
-    public String save(@RequestBody Map<String,Object> map, Model model){
+    public MapRestResponse save(@RequestBody Map<String,Object> map){
 
         String voiceName=(String)map.get("voiceName")==null?"xiaoxue":(String)map.get("voiceName");
         String speed=(Integer)map.get("speed")==null?"0":String.valueOf((Integer)map.get("speed"));
@@ -68,8 +69,8 @@ public class TtsController {
 
         String audioUrl="http://172.31.202.41:52220/tts/"+sid+".wav";
         System.out.println(audioUrl);
-        model.addAttribute("audioUrl",audioUrl);
-        return "index";
+        //model.addAttribute("audioUrl",audioUrl);
+        return MapRestResponse.ok().put("audioUrl", audioUrl);
     }
 
     private static void saveResp(String body,String sid) throws IOException {
