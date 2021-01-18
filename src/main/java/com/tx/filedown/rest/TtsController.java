@@ -75,7 +75,7 @@ public class TtsController {
                 }
             }
         });
-        String audioUrl="http://172.31.202.41:52220/tts/"+sid+".wav";
+        String audioUrl="http://127.0.0.1:52220/tts/"+sid+".wav";
         System.out.println(audioUrl);
         //model.addAttribute("audioUrl",audioUrl);
         return MapRestResponse.ok().put("audioUrl", audioUrl);
