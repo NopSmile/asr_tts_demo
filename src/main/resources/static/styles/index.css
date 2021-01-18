@@ -28,12 +28,12 @@ body{
 }
 /* 标题 */
 .title{
-    width: 100%;
-    text-align: center;
-    font-size: 24px;
-    color: #fff;
-    margin: 50px 0;
-    box-sizing: border-box;
+	width: 100%;
+	text-align: center;
+	font-size: 24px;
+	color: #fff;
+	margin: 50px 0;
+	box-sizing: border-box;
 }
 .cont{
 	display: flex;
@@ -48,9 +48,9 @@ body{
 }
 .box-title{
 	line-height: 20px;
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
+	font-size: 14px;
+	color: #fff;
+	margin-bottom: 10px;
 }
 .box-cont{
 	width: 100%;
@@ -204,9 +204,9 @@ body{
 }
 .el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active{
 	color: #fff !important;
-    background-color: #252525 !important;
-    border-right-color: #252525 !important;
-    border-left-color: #252525 !important;
+	background-color: #252525 !important;
+	border-right-color: #252525 !important;
+	border-left-color: #252525 !important;
 }
 .el-tabs--border-card>.el-tabs__content{
 	background-color: #252525 !important;
@@ -223,11 +223,36 @@ body{
 }
 .set-title{
 	font-size: 14px;
-    color: #fff;
-    margin: 10px;
+	color: #fff;
+	margin: 10px;
+}
+.set-val{
+	width: 35px;
+	font-size: 14px;
+	color: #fff;
+	text-align: center;
 }
 .el-slider{
 	width: 80%;
+}
+.el-slider__runway {
+	height: 3px !important;
+	background: hsla(0,0%,100%,.1) !important;
+}
+.el-slider__bar {
+	height: 3px !important;
+	background-color: #ff6a00 !important;
+}
+.el-slider__button-wrapper {
+	height: 10px !important;
+	width: 10px !important;
+	top: -10px !important;
+}
+.el-slider__button {
+	height: 10px !important;
+	width: 10px !important;
+	border: 0 !important;
+	background: #ff6a00 !important;
 }
 .btn-box{
 	width: 100%;
@@ -237,11 +262,11 @@ body{
 }
 .btn{
 	cursor: pointer;
-    width: 120px;
+	width: 120px;
 	height: 35px;
 	line-height: 35px;
-    background: #ff6a00;
-    text-align: center;
-    font-size: 14px;
+	background: #ff6a00;
+	text-align: center;
+	font-size: 14px;
 	color: #fff;
 }

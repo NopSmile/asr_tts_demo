@@ -6,128 +6,198 @@
     <title>智能AI听写功能</title>
     <link rel="stylesheet" type="text/css" href="styles/index.css">
     <link rel="stylesheet" type="text/css" href="styles/element.css">
-    <script src="js/vue.js"></script>
-    <script src="js/element.js"></script>
 </head>
 <body>
-    <div class="main" id="app">
-        <!-- 功能1 -->
-        <div class="title">录音识别</div>
-        <div class="cont">
-            <div class="left-box box">
-                <div class="box-title">语音录入</div>
-                <div class="box-cont">
-                    <input class="box-input" type="file" />
-                    <p class="box-tip">点击上传录音文件，可以识别录音内容。</p>
-                </div>
-            </div>
-            <div class="right-box box">
-                <div class="box-title">识别结果</div>
-                <div class="box-cont">
-                    <div class="bg-area">
-                        <div class="bg bg1"></div>
-                        <div class="bg bg2"></div>
-                        <div class="bg bg3"></div>
-                        <div class="bg bg4"></div>
-                        <div class="bg bg5"></div>
-                        <div class="bg bg6"></div>
-                        <div class="bg bg7"></div>
-                        <div class="bg bg8"></div>
-                        <div class="bg bg9"></div>
-                    </div>
-                    <textarea class="box-text" style="position: relative"></textarea>
-                </div>
+<div class="main" id="app">
+    <!-- 功能1 -->
+    <div class="title">录音识别</div>
+    <div class="cont">
+        <div class="left-box box">
+            <div class="box-title">语音录入</div>
+            <div class="box-cont">
+                <!--                    <input class="box-input" type="file" />-->
+                <input class="box-input" type="file" @change="handleFileChange" ref="inputer">
+                <p class="box-tip">点击上传录音文件，可以识别录音内容。</p>
             </div>
         </div>
-
-        <!-- 功能2 -->
-        <div class="title">音频播放</div>
-        <div class="cont">
-            <div class="box">
-                <div class="box-title">示例文本</div>
-                <div class="box-cont">
-                    <textarea class="box-text" style="position: relative" placeholder="请输入文字"></textarea>
+        <div class="right-box box">
+            <div class="box-title">识别结果</div>
+            <div class="box-cont">
+                <div class="bg-area">
+                    <div class="bg bg1"></div>
+                    <div class="bg bg2"></div>
+                    <div class="bg bg3"></div>
+                    <div class="bg bg4"></div>
+                    <div class="bg bg5"></div>
+                    <div class="bg bg6"></div>
+                    <div class="bg bg7"></div>
+                    <div class="bg bg8"></div>
+                    <div class="bg bg9"></div>
                 </div>
+                <textarea class="box-text"  v-model="outText" style="position: relative"></textarea>
             </div>
-            <div class="box">
-                <div class="box-title">场景</div>
-                <div class="box-cont">
-                    <div class="scene">
-                        <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
-                            <el-tab-pane label="通用" name="first">
-                                <div class="scene-cont">
-                                    <div :class=" sceneActive==item.cont?'active':''" class="scene-item"  v-for="(item, index) in sceneList" :key="index" @click="choseItem(item)">
-                                        <img :src="item.img" :alt="item.img"/>
-                                        <span class="name">{{item.cont}}</span>
-                                        <div class="icon">精品</div>
-                                    </div>
+        </div>
+    </div>
+
+    <!-- 功能2 -->
+    <div class="title">音频播放</div>
+    <div class="cont">
+        <div class="box">
+            <div class="box-title">示例文本</div>
+            <div class="box-cont">
+                <textarea class="box-text" v-model="inputText"  placeholder="请输入文字"></textarea>
+            </div>
+        </div>
+        <div class="box">
+            <div class="box-title">场景</div>
+            <div class="box-cont">
+                <div class="scene">
+                    <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
+                        <el-tab-pane label="通用" name="first">
+                            <div class="scene-cont">
+                                <div :class=" sceneActive==item.cont?'active':''" class="scene-item"  v-for="(item, index) in sceneList" :key="index" @click="choseItem(item)">
+                                    <img :src="item.img" :alt="item.img"/>
+                                    <span class="name">{{item.cont}}</span>
+                                    <div class="icon">精品</div>
                                 </div>
-                            </el-tab-pane>
-                            <el-tab-pane label="客服" name="second"></el-tab-pane>
-                            <el-tab-pane label="英文" name="third"></el-tab-pane>
-                            <el-tab-pane label="童音" name="fourth"></el-tab-pane>
-                        </el-tabs>
+                            </div>
+                        </el-tab-pane>
+                        <el-tab-pane label="客服" name="second"></el-tab-pane>
+                        <el-tab-pane label="英文" name="third"></el-tab-pane>
+                        <el-tab-pane label="童音" name="fourth"></el-tab-pane>
+                    </el-tabs>
+                </div>
+                <div class="set">
+                    <div class="set-box">
+                        <span class="set-title">音量</span>
+                        <el-slider v-model="value1"  :max=40 :format-tooltip="formatTooltip1"  @change="yinliangChange"></el-slider>
+                        <div class="set-val">{{yinliang}}</div>
                     </div>
-                    <div class="set">
-                        <div class="set-box">
-                            <span class="set-title">音量</span>
-                            <el-slider v-model="yinliang"></el-slider>
-                        </div>
-                        <div class="set-box">
-                            <span class="set-title">语速</span>
-                            <el-slider v-model="yusu"></el-slider>
-                        </div>
+                    <div class="set-box">
+                        <span class="set-title">语速</span>
+                        <el-slider v-model="value2" :max=100 :format-tooltip="formatTooltip2"  @change="yusuChange"></el-slider>
+                        <div class="set-val">{{yusu}}</div>
                     </div>
-                    <div class="btn-box">
-                        <div class="btn">立即合成</div>
-                    </div>
+                </div>
+                <div class="btn-box">
+                    <div class="btn" @click="lijihecheng">立即合成</div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </body>
+<script src="js/vue.js"></script>
+<script src="js/element.js"></script>
+<script src="js/jquery.min.js"></script>
 <script>
-    var app = new Vue({
+    var vm = new Vue({
         el: '#app',
         data: {
-            yinliang:-20,
+            outText:'',
+            inputText:'',
+            value1:20,
+            value2:50,
+            yinliang:0,
             yusu:0,
             activeName: 'first',
             sceneActive:'冰洁,女青年,中文',
+            sceneName:"bingjie",
             sceneList:[
                 {
                     img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
                     cont:"冰洁,女青年,中文",
+                    sceneName:"bingjie"
                 },
                 {
                     img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
                     cont:"虫虫,女青年,中文",
+                    sceneName:"chongchong"
                 },{
                     img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
                     cont:"小康,女青年,中文",
+                    sceneName:"xiaokang"
                 },
                 {
                     img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
                     cont:"小雪,女青年,中文",
+                    sceneName:"xiaoxue"
                 },
                 {
                     img:"https://img.alicdn.com/tfs/TB1Ij98DQPoK1RjSZKbXXX1IXXa-517-517.png",
                     cont:"小媛,女青年,中文",
+                    sceneName:"xiaoyuan"
                 },
                 {
                     img:"https://img.alicdn.com/tfs/TB1Ek54DPTpK1RjSZKPXXa3UpXa-517-517.png",
                     cont:"一峰,男青年,中文",
+                    sceneName:"yifeng"
                 },
-            ]
+            ],
+            formData:{},
+            file:''
         },
         methods: {
+            handleFileChange (e) {
+                console.log('111111',e);
+                let inputDOM = this.$refs.inputer;
+                this.file = inputDOM.files[0];// 通过DOM取文件数据
+                let size = Math.floor(this.file.size / 1024);//计算文件的大小　
+                console.log('22222',this.file, size);
+                this.formData=new FormData();//new一个formData事件
+                this.formData.append("file",this.file); //将file属性添加到formData里
+                //此时formData就是我们要向后台传的参数了
+                console.log(this.formData);
+            },
             handleClick(tab, event) {
                 console.log(tab, event);
             },
             choseItem(item){
                 this.sceneActive = item.cont;
-            }
+                this.sceneName = item.sceneName;
+            },
+            yinliangChange(val){
+                this.yinliang = Number(val-20);
+            },
+            yusuChange(val){
+                this.yusu = Number((val-50)*10);
+            },
+            formatTooltip1(val){
+                if(val == 20){
+                    return '0';
+                }
+                return val-20;
+            },
+            formatTooltip2(val){
+                if(val == 50){
+                    return '0';
+                }
+                return (val-50)*10;
+            },
+            //立即合成
+            lijihecheng(){
+                let data ={
+                    voiceName: this.sceneName,
+                    speed: this.yusu,
+                    volume: this.yinliang,
+                    text: this.inputText
+                } ;
+                console.log('1111111',data);
+                jQuery.ajax({
+                    url : "/tts/go",
+                    type : 'post',
+                    dataType : 'json',
+                    contentType:'application/json;charset=UTF-8',
+                    data:JSON.stringify(data),
+                    success : function(data) {
+                        console.log('11111',data);
+                    },
+                    error : function(err) {
+                        console.log(err);
+                    }
+                })
+            },
         }
-    })
+    });
 </script>
 </html>
