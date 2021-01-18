@@ -35,11 +35,11 @@ public class TtsController {
 
 
     @PostMapping("/go")
-    public String save(@RequestBody Map<String,Object> map){
+    public String save(@RequestBody Map<String,Object> map, Model model){
 
         String voiceName=(String)map.get("voiceName")==null?"xiaoxue":(String)map.get("voiceName");
-        String speed=(String)map.get("speed")==null?"0":(String)map.get("speed");
-        String volume=(String)map.get("volume")==null?"0":(String)map.get("volume");
+        String speed=(Integer)map.get("speed")==null?"0":String.valueOf((Integer)map.get("speed"));
+        String volume=(Integer)map.get("volume")==null?"0":String.valueOf((Integer)map.get("volume"));
         String text=(String)map.get("text")==null?"我是测试语音。":(String)map.get("text");
         String sid=(String)map.get("sid")==null? KeyGenerator.getUniqueID() :(String)map.get("sid");
 
@@ -66,7 +66,10 @@ public class TtsController {
             e.printStackTrace();
         }
 
-        return "http://172.31.202.41:52220/tts/"+sid+".wav";
+        String audioUrl="http://172.31.202.41:52220/tts/"+sid+".wav";
+        System.out.println(audioUrl);
+        model.addAttribute("audioUrl",audioUrl);
+        return "index";
     }
 
     private static void saveResp(String body,String sid) throws IOException {
