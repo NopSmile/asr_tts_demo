@@ -32,10 +32,6 @@ public class AsrUploadController {
 
     @GetMapping("/")
     public String uploladPage(Model model){
-        if(!"".equals(Constant.LASTRESULT)){
-            model.addAttribute("path",Constant.LASTRESULT);
-            model.addAttribute("result",Constant.STRRESULT);
-        }
 
         return "index";
     }

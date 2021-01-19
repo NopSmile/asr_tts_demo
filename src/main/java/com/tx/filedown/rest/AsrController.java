@@ -48,8 +48,8 @@ public class AsrController {
             //添加任务
             Tools.addIstTask(wavcid, Constant.ISTURL,waitingUrl,task_notyfy_url);
             System.out.println("回调地址为:"+task_notyfy_url + "-----> 录音地址为:"+waitingUrl);
-            String result="http://127.0.0.1:52220/asr/"+wavcid+".txt";
-            Constant.LASTRESULT=result;
+            String result=Constant.asrurl+wavcid+".txt";
+            //Constant.LASTRESULT=result;
             return MapRestResponse.ok().put("path",result).put("filename",wavcid+".txt");
         }else{
             return MapRestResponse.ok().put("path",filePath);
