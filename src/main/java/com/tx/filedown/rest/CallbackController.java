@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,10 +76,9 @@ public class CallbackController {
         File fileCur = new File(fileName);
         FileUtil.createFile(fileCur);
         FileUtil.filechaseWrite(resultBuff.toString() + "\n", fileName);
-        Constant.STRRESULT=resultBuff.toString();
 
         try {
-            WebSocketServer.sendInfo("微软将为令人绝望","111");
+            WebSocketServer.sendInfo(resultBuff.toString(),"111");
         } catch (IOException e) {
             e.printStackTrace();
         }
