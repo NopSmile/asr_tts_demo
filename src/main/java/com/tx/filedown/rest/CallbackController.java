@@ -78,7 +78,7 @@ public class CallbackController {
         Constant.STRRESULT=resultBuff.toString();
 
         try {
-            WebSocketServer.sendInfo(resultBuff.toString(),"111");
+            WebSocketServer.sendInfo("微软将为令人绝望","111");
         } catch (IOException e) {
             e.printStackTrace();
         }

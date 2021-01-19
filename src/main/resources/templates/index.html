@@ -6,6 +6,11 @@
     <title>智能AI听写功能</title>
     <link rel="stylesheet" type="text/css" href="styles/index.css">
     <link rel="stylesheet" type="text/css" href="styles/element.css">
+    <style type="text/css">
+        [v-cloak] {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
 <div class="main" id="app">
@@ -15,14 +20,21 @@
         <div class="left-box box">
             <div class="box-title">语音录入</div>
             <div class="box-cont">
-                <!--                    <input class="box-input" type="file" />-->
-                <input class="box-input" type="file" @change="handleFileChange" ref="inputer">
+                <form enctype='multipart/form-data' v-if="!cancelShiBie">
+                    <input class="box-input" type="file" @change="handleFileChange" />
+                </form>
+                <div v-cloak class="cancel-shibie"  v-if="cancelShiBie" @click="cancelShiBieEvent">取消识别</div>
                 <p class="box-tip">点击上传录音文件，可以识别录音内容。</p>
             </div>
         </div>
         <div class="right-box box">
             <div class="box-title">识别结果</div>
-            <div class="box-cont">
+            <div class="box-cont"
+                 v-loading="loading"
+                 element-loading-text="正在识别中"
+                 element-loading-spinner="el-icon-loading"
+                 element-loading-background="rgba(0, 0, 0, 0.8)"
+            >
                 <div class="bg-area">
                     <div class="bg bg1"></div>
                     <div class="bg bg2"></div>
@@ -34,7 +46,7 @@
                     <div class="bg bg8"></div>
                     <div class="bg bg9"></div>
                 </div>
-                <textarea class="box-text"  v-model="outText" style="position: relative"></textarea>
+                <textarea class="box-text"  v-model="outText" disabled style="position: relative"></textarea>
             </div>
         </div>
     </div>
@@ -81,6 +93,7 @@
                 </div>
                 <div class="btn-box">
                     <div class="btn" @click="lijihecheng">立即合成</div>
+                    <audio :src="audioUrl" id="myaudio" controls="controls"></audio>
                 </div>
             </div>
         </div>
@@ -94,12 +107,15 @@
     var vm = new Vue({
         el: '#app',
         data: {
-            outText:'',
-            inputText:'',
+            loading:false,
+            cancelShiBie:false,//取消识别按钮
+            outText:'',//音频识别结果
+            inputText:'',//输入合成音频文本
             value1:20,
             value2:50,
             yinliang:0,
             yusu:0,
+            audioUrl:'',
             activeName: 'first',
             sceneActive:'冰洁,女青年,中文',
             sceneName:"bingjie",
@@ -134,20 +150,59 @@
                     sceneName:"yifeng"
                 },
             ],
-            formData:{},
-            file:''
+            websocket:{},
         },
         methods: {
+            //取消识别文件
+            cancelShiBieEvent(){
+                this.loading = false;
+                this.cancelShiBie = false;
+                this.websocket.close();
+            },
+            //上传录音文件并识别
             handleFileChange (e) {
-                console.log('111111',e);
-                let inputDOM = this.$refs.inputer;
-                this.file = inputDOM.files[0];// 通过DOM取文件数据
-                let size = Math.floor(this.file.size / 1024);//计算文件的大小　
-                console.log('22222',this.file, size);
-                this.formData=new FormData();//new一个formData事件
-                this.formData.append("file",this.file); //将file属性添加到formData里
-                //此时formData就是我们要向后台传的参数了
-                console.log(this.formData);
+                this.loading = true;
+                this.cancelShiBie = true;
+                this.websocketFun();
+                let file = e.target.files[0];
+                let formData = new FormData();
+                formData.append("file",file);
+                jQuery.ajax({
+                    url : "/asr/upload",
+                    type : 'post',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success : function(data) {
+                        console.log('上传成功');
+                    },
+                    error : function(err) {
+                        console.log('上传失败');
+                    }
+                })
+            },
+            websocketFun(){
+                let that = this;
+                //let timestamp=new Date().getTime();
+                if(window.WebSocket) {
+                    this.websocket = new WebSocket('ws://127.0.0.1:52220/ws/111');
+                    this.websocket.onopen = function(e){
+                        console.log("连接服务器成功");
+                    }
+                    this.websocket.onmessage = function(e){
+                        console.log('接受消息',e.data);
+                        that.loading = false;
+                        that.cancelShiBie = false;
+                        that.outText = e.data;
+                        that.websocket.close();
+                    }
+                    this.websocket.onclose = function(e){
+                        console.log("服务器关闭");
+                    }
+                    this.websocket.onerror = function(){
+                        console.log("连接出错");
+                    }
+                }
             },
             handleClick(tab, event) {
                 console.log(tab, event);
@@ -190,7 +245,11 @@
                     contentType:'application/json;charset=UTF-8',
                     data:JSON.stringify(data),
                     success : function(data) {
-                        console.log('11111',data);
+                        console.log('2222',data);
+                        setTimeout(function(){
+                            vm.audioUrl = data.audioUrl;
+                        },3000);
+                        //document.getElementById('myaudio').play();
                     },
                     error : function(err) {
                         console.log(err);
