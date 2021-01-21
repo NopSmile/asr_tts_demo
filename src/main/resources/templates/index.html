@@ -20,10 +20,14 @@
         <div class="left-box box">
             <div class="box-title">语音录入</div>
             <div class="box-cont">
+                <el-button class="record-btn" @click="startRecording" v-if="!showRecordBtn">开始录音</el-button>
+                <el-button class="record-btn" @click="stopRecording" disabled="disabledStopBtn" v-if="showRecordBtn">停止录音</el-button>
+<!--                <div class="record-btn btn" @click="startRecording" v-if="!showRecordBtn">开始录音</div>-->
+<!--                <div class="record-btn btn" @click="stopRecording" v-if="showRecordBtn">停止录音</div>-->
                 <form enctype='multipart/form-data' v-if="!cancelShiBie">
                     <input class="box-input" type="file" @change="handleFileChange" />
                 </form>
-                <div v-cloak class="cancel-shibie"  v-if="cancelShiBie" @click="cancelShiBieEvent">取消识别</div>
+                <div v-cloak class="cancel-shibie btn"  v-if="cancelShiBie" @click="cancelShiBieEvent">取消识别</div>
                 <p class="box-tip">点击上传录音文件，可以识别录音内容。</p>
             </div>
         </div>
@@ -57,7 +61,7 @@
         <div class="box">
             <div class="box-title">示例文本</div>
             <div class="box-cont">
-                <textarea class="box-text" v-model="inputText"  placeholder="请输入文字"></textarea>
+                <textarea class="box-text" v-model="inputText" value="" onchange="checkField(value)"  placeholder="请输入文字"></textarea>
             </div>
         </div>
         <div class="box">
@@ -92,8 +96,11 @@
                     </div>
                 </div>
                 <div class="btn-box">
-                    <div class="btn" @click="lijihecheng">立即合成</div>
-                    <audio :src="audioUrl" id="myaudio" controls="controls"></audio>
+                    <div class="btn" @click="lijihecheng" v-if="!showAudioBtn">立即合成</div>
+                    <div v-cloak class="btn" @click="audioEvent"  v-if="showAudioBtn">
+                        <span>{{audioBtn}}</span>
+                        <audio id="audioId" @ended="audioEnded()" autoplay="autoplay" :src="audioUrl"></audio>
+                    </div>
                 </div>
             </div>
         </div>
@@ -103,14 +110,19 @@
 <script src="js/vue.js"></script>
 <script src="js/element.js"></script>
 <script src="js/jquery.min.js"></script>
+<script src="js/recorder.js"></script>
 <script>
     var vm = new Vue({
         el: '#app',
         data: {
             loading:false,
+            showAudioBtn:false,
+            showRecordBtn:false,
+            disabledStopBtn:false,
             cancelShiBie:false,//取消识别按钮
             outText:'',//音频识别结果
-            inputText:'',//输入合成音频文本
+            inputText:'为了减少您的损失，请您今天晚上6点前尽快处理好本次欠款，好吧？',//输入合成音频文本
+            audioBtn:'',
             value1:20,
             value2:50,
             yinliang:0,
@@ -151,15 +163,44 @@
                 },
             ],
             websocket:{},
+            audio_context:{},
+            recorder:{}
         },
         methods: {
+            startRecording(){
+                this.showRecordBtn = true;
+                let that = this;
+                vm.recorder && vm.recorder.record();
+                let maxtime = 15;//按秒计算
+                let timer = setInterval(function () {
+                    if(maxtime >= 0){
+                        --maxtime;
+                    }else{
+                        clearInterval(timer);
+                        that.stopRecording();
+                    }
+                }, 1000);
+            },
+            stopRecording(){
+                this.disabledStopBtn = true;
+                this.loading = true;
+                this.cancelShiBie = true;
+                this.websocketFun();
+                vm.recorder && vm.recorder.stop();
+                vm.recorder && vm.recorder.exportWAV(function(blob) {
+                    let formData = new FormData();
+                    formData.append("file", blob,"file.wav");
+                    vm.uploadFiles(formData);
+                });
+                vm.recorder.clear();
+            },
             //取消识别文件
             cancelShiBieEvent(){
                 this.loading = false;
                 this.cancelShiBie = false;
                 this.websocket.close();
             },
-            //上传录音文件并识别
+            //选择本地文件
             handleFileChange (e) {
                 this.loading = true;
                 this.cancelShiBie = true;
@@ -167,6 +208,10 @@
                 let file = e.target.files[0];
                 let formData = new FormData();
                 formData.append("file",file);
+                this.uploadFiles(formData);
+            },
+            //上传录音文件并识别
+            uploadFiles(formData){
                 jQuery.ajax({
                     url : "/asr/upload",
                     type : 'post',
@@ -177,22 +222,28 @@
                         console.log('上传成功');
                     },
                     error : function(err) {
-                        console.log('上传失败');
+                        vm.$message.error('录音文件上传失败');
+                        vm.loading = false;
+                        vm.cancelShiBie = false;
+                        vm.showRecordBtn = false;
+                        vm.outText = '';
+                        vm.websocket.close();
                     }
                 })
             },
             websocketFun(){
                 let that = this;
-                //let timestamp=new Date().getTime();
+                let timestamp=new Date().getTime();
+                console.log(timestamp);
                 if(window.WebSocket) {
                     this.websocket = new WebSocket('ws://127.0.0.1:52220/ws/111');
                     this.websocket.onopen = function(e){
                         console.log("连接服务器成功");
                     }
                     this.websocket.onmessage = function(e){
-                        console.log('接受消息',e.data);
                         that.loading = false;
                         that.cancelShiBie = false;
+                        that.showRecordBtn = false;
                         that.outText = e.data;
                         that.websocket.close();
                     }
@@ -231,13 +282,14 @@
             },
             //立即合成
             lijihecheng(){
+                this.showAudioBtn = true;
+                this.audioBtn = "加载中";
                 let data ={
                     voiceName: this.sceneName,
                     speed: this.yusu,
                     volume: this.yinliang,
                     text: this.inputText
-                } ;
-                console.log('1111111',data);
+                };
                 jQuery.ajax({
                     url : "/tts/go",
                     type : 'post',
@@ -245,18 +297,48 @@
                     contentType:'application/json;charset=UTF-8',
                     data:JSON.stringify(data),
                     success : function(data) {
-                        console.log('2222',data);
                         setTimeout(function(){
                             vm.audioUrl = data.audioUrl;
-                        },3000);
-                        //document.getElementById('myaudio').play();
-                    },
-                    error : function(err) {
-                        console.log(err);
+                            vm.audioBtn = "暂停";
+                        },5000);
                     }
                 })
             },
+            audioEvent(e){
+                e.stopPropagation();//防止冒泡
+                let audio = document.getElementById('audioId');
+                if(audio.paused){
+                    this.audioBtn = "暂停";
+                    audio.play();
+                    return;
+                }else{
+                    this.audioBtn = "播放";
+                    audio.pause();
+                }
+            },
+            //播放结束回调
+            audioEnded(){
+                this.audioBtn = "播放";
+            },
         }
     });
+    function startUserMedia(stream) {
+        var input = vm.audio_context.createMediaStreamSource(stream);
+        vm.recorder = new Recorder(input);
+    };
+    window.onload = function init() {
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+        window.URL = window.URL || window.webkitURL;
+        vm.audio_context = new AudioContext;
+        navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+            console.log('拒接使用麦克风');
+        });
+    };
+    function checkField(val){
+        vm.showAudioBtn = false;
+        vm.audioUrl = '';
+        vm.audioBtn = "";
+    };
 </script>
 </html>

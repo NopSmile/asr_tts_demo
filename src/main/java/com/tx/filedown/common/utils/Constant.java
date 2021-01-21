@@ -25,7 +25,7 @@ public class Constant {
     //  public static String NOTISTIFYURL="http://192.168.60.79:52220/ist/callback";
 
 
-    public static final String asrurl="http://172.31.202.41:52220/asr/";
+    public static final String asrurl="http://192.168.102.215:52220/asr/";
     //public static final String asrurl="http://192.168.60.79:52220/asr/";
 
 
