@@ -50,9 +50,9 @@ public class AsrController {
             System.out.println("回调地址为:"+task_notyfy_url + "-----> 录音地址为:"+waitingUrl);
             String result=Constant.asrurl+wavcid+".txt";
             //Constant.LASTRESULT=result;
-            return MapRestResponse.ok().put("path",result).put("filename",wavcid+".txt");
+            return MapRestResponse.ok().put("path",result).put("sid",filename).put("filename",wavcid+".txt");
         }else{
-            return MapRestResponse.ok().put("path",filePath);
+            return MapRestResponse.ok().put("path",filePath).put("sid",filename);
         }
     }
 
