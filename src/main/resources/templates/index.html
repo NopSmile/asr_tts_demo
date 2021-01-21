@@ -21,14 +21,15 @@
             <div class="box-title">语音录入</div>
             <div class="box-cont">
                 <el-button class="record-btn" @click="startRecording" v-if="!showRecordBtn">开始录音</el-button>
-                <el-button class="record-btn" @click="stopRecording" disabled="disabledStopBtn" v-if="showRecordBtn">停止录音</el-button>
-<!--                <div class="record-btn btn" @click="startRecording" v-if="!showRecordBtn">开始录音</div>-->
-<!--                <div class="record-btn btn" @click="stopRecording" v-if="showRecordBtn">停止录音</div>-->
+                <el-button class="record-btn" @click="stopRecording" :disabled="disabledStopBtn" v-if="showRecordBtn">停止录音</el-button>
                 <form enctype='multipart/form-data' v-if="!cancelShiBie">
-                    <input class="box-input" type="file" @change="handleFileChange" />
+                    <div class="box-input-div">
+                        <span>上传文件</span>
+                        <input class="box-input" type="file" @change="handleFileChange"/>
+                    </div>
                 </form>
-                <div v-cloak class="cancel-shibie btn"  v-if="cancelShiBie" @click="cancelShiBieEvent">取消识别</div>
-                <p class="box-tip">点击上传录音文件，可以识别录音内容。</p>
+                <el-button v-cloak class="cancel-shibie"  v-if="cancelShiBie" @click="cancelShiBieEvent">取消识别</el-button>
+                <p class="box-tip">点击上传录音文件，可以识别录音内容，开始录音时间最多15秒。</p>
             </div>
         </div>
         <div class="right-box box">
@@ -61,7 +62,8 @@
         <div class="box">
             <div class="box-title">示例文本</div>
             <div class="box-cont">
-                <textarea class="box-text" v-model="inputText" value="" onchange="checkField(value)"  placeholder="请输入文字"></textarea>
+                <textarea class="box-text" v-model="inputText" maxlength="300" onchange="checkField()"  placeholder="请输入文字"></textarea>
+                <p class="box-tip2">最多可输入<span>300</span>个字，超出部分合成将被截断</p>
             </div>
         </div>
         <div class="box">
@@ -164,7 +166,8 @@
             ],
             websocket:{},
             audio_context:{},
-            recorder:{}
+            recorder:{},
+            timer:''
         },
         methods: {
             startRecording(){
@@ -172,20 +175,20 @@
                 let that = this;
                 vm.recorder && vm.recorder.record();
                 let maxtime = 15;//按秒计算
-                let timer = setInterval(function () {
+                this.timer = setInterval(function () {
                     if(maxtime >= 0){
                         --maxtime;
                     }else{
-                        clearInterval(timer);
+                        clearInterval(that.timer);
                         that.stopRecording();
                     }
                 }, 1000);
             },
             stopRecording(){
+                clearInterval(this.timer);
                 this.disabledStopBtn = true;
                 this.loading = true;
                 this.cancelShiBie = true;
-                this.websocketFun();
                 vm.recorder && vm.recorder.stop();
                 vm.recorder && vm.recorder.exportWAV(function(blob) {
                     let formData = new FormData();
@@ -198,14 +201,15 @@
             cancelShiBieEvent(){
                 this.loading = false;
                 this.cancelShiBie = false;
+                this.disabledStopBtn = false;
+                this.showRecordBtn = false;
                 this.websocket.close();
             },
             //选择本地文件
-            handleFileChange (e) {
+            handleFileChange (event) {
                 this.loading = true;
                 this.cancelShiBie = true;
-                this.websocketFun();
-                let file = e.target.files[0];
+                let file = event.target.files[0];
                 let formData = new FormData();
                 formData.append("file",file);
                 this.uploadFiles(formData);
@@ -219,24 +223,22 @@
                     contentType: false,
                     data: formData,
                     success : function(data) {
-                        console.log('上传成功');
+                        vm.websocketFun(data.sid);
                     },
                     error : function(err) {
                         vm.$message.error('录音文件上传失败');
                         vm.loading = false;
                         vm.cancelShiBie = false;
                         vm.showRecordBtn = false;
+                        vm.disabledStopBtn = false;
                         vm.outText = '';
-                        vm.websocket.close();
                     }
                 })
             },
-            websocketFun(){
+            websocketFun(sid){
                 let that = this;
-                let timestamp=new Date().getTime();
-                console.log(timestamp);
                 if(window.WebSocket) {
-                    this.websocket = new WebSocket('ws://127.0.0.1:52220/ws/111');
+                    this.websocket = new WebSocket('ws://127.0.0.1:52220/ws/'+sid);
                     this.websocket.onopen = function(e){
                         console.log("连接服务器成功");
                     }
@@ -244,6 +246,7 @@
                         that.loading = false;
                         that.cancelShiBie = false;
                         that.showRecordBtn = false;
+                        that.disabledStopBtn = false;
                         that.outText = e.data;
                         that.websocket.close();
                     }
@@ -261,12 +264,15 @@
             choseItem(item){
                 this.sceneActive = item.cont;
                 this.sceneName = item.sceneName;
+                checkField();
             },
             yinliangChange(val){
                 this.yinliang = Number(val-20);
+                checkField();
             },
             yusuChange(val){
                 this.yusu = Number((val-50)*10);
+                checkField();
             },
             formatTooltip1(val){
                 if(val == 20){
@@ -301,6 +307,11 @@
                             vm.audioUrl = data.audioUrl;
                             vm.audioBtn = "暂停";
                         },5000);
+                    },
+                    error : function(err) {
+                        vm.$message.error('音频合成失败');
+                        vm.showAudioBtn = false;
+                        vm.audioBtn = "";
                     }
                 })
             },
@@ -335,7 +346,7 @@
             console.log('拒接使用麦克风');
         });
     };
-    function checkField(val){
+    function checkField(){
         vm.showAudioBtn = false;
         vm.audioUrl = '';
         vm.audioBtn = "";
