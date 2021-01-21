@@ -333,16 +333,16 @@
             },
         }
     });
-    function startUserMedia(stream) {
-        var input = vm.audio_context.createMediaStreamSource(stream);
-        vm.recorder = new Recorder(input);
-    };
     window.onload = function init() {
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
-        window.URL = window.URL || window.webkitURL;
         vm.audio_context = new AudioContext;
-        navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+        navigator.mediaDevices.getUserMedia({audio: true})
+        .then(function(stream) {
+            console.log("可以使用麦克风");
+            let input = vm.audio_context.createMediaStreamSource(stream);
+            vm.recorder = new Recorder(input);
+        })
+        .catch(function(err) {
             console.log('拒接使用麦克风');
         });
     };
