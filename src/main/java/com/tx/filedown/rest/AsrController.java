@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 @RestController
 @RequestMapping("/asr")
@@ -26,6 +28,9 @@ public class AsrController {
 
     @Value("${asr}")
     private int asr;
+
+    @Resource
+    private ExecutorService executorService;
 
     @PostMapping("/upload")
     public MapRestResponse uploading(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws UnknownHostException {
@@ -45,9 +50,15 @@ public class AsrController {
             //生成唯一的消息通知地址
             String task_notyfy_url= Constant.NOTISTIFYURL;
             String waitingUrl=Constant.asrurl+filename;
-            //添加任务
-            Tools.addIstTask(wavcid, Constant.ISTURL,waitingUrl,task_notyfy_url);
-            System.out.println("回调地址为:"+task_notyfy_url + "-----> 录音地址为:"+waitingUrl);
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    //添加任务
+                    Tools.addIstTask(wavcid, Constant.ISTURL,waitingUrl,task_notyfy_url);
+                    System.out.println("回调地址为:"+task_notyfy_url + "-----> 录音地址为:"+waitingUrl);
+                }
+            });
+
             String result=Constant.asrurl+wavcid+".txt";
             //Constant.LASTRESULT=result;
             return MapRestResponse.ok().put("path",result).put("sid",filename).put("filename",wavcid+".txt");
