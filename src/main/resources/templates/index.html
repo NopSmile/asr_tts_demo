@@ -29,7 +29,7 @@
                     </div>
                 </form>
                 <el-button v-cloak class="cancel-shibie"  v-if="cancelShiBie" @click="cancelShiBieEvent">取消识别</el-button>
-                <p class="box-tip">点击上传录音文件，可以识别录音内容，开始录音时间最多15秒。</p>
+                <p class="box-tip">使用录音功能时，请以<span>谷歌浏览器</span>为首选，录音时间最多15秒，超出时间自动结束。</p>
             </div>
         </div>
         <div class="right-box box">
@@ -222,7 +222,7 @@
                     vm.rec.close();//关闭录音
                 });
             },
-            //取消识别文件
+            //取消识别文件,并初始化
             cancelShiBieEvent(){
                 this.loading = false;
                 this.cancelShiBie = false;
@@ -254,11 +254,8 @@
                     },
                     error : function(err) {
                         vm.$message.error('录音文件上传失败');
-                        vm.loading = false;
-                        vm.cancelShiBie = false;
-                        vm.showRecordBtn = false;
-                        vm.disabledStopBtn = false;
                         vm.outText = '';
+                        vm.cancelShiBieEvent();
                     }
                 })
             },
@@ -274,18 +271,28 @@
                         console.log("连接服务器成功");
                     }
                     this.websocket.onmessage = function(e){
-                        that.loading = false;
-                        that.cancelShiBie = false;
-                        that.showRecordBtn = false;
-                        that.disabledStopBtn = false;
                         that.outText = e.data;
-                        that.websocket.close();
+                        that.cancelShiBieEvent();
                     }
                     this.websocket.onclose = function(e){
                         console.log("服务器关闭");
                     }
                     this.websocket.onerror = function(){
                         console.log("连接出错");
+                        let t = setInterval(function () {
+                            jQuery.get("/asrmsg/",{time},function(data){
+                                console.log(data);
+                                if(data){
+                                    vm.outText = data;
+                                    vm.cancelShiBieEvent();
+                                    clearInterval(t);
+                                }
+                            },function (err) {
+                                vm.$message.error('录音文件识别失败');
+                                vm.cancelShiBieEvent();
+                                clearInterval(t);
+                            });
+                        },3000)
                     }
                 }
             },
