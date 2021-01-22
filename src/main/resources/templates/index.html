@@ -189,6 +189,7 @@
                 this.disabledStopBtn = true;
                 this.loading = true;
                 this.cancelShiBie = true;
+                this.websocketFun();
                 vm.recorder && vm.recorder.stop();
                 vm.recorder && vm.recorder.exportWAV(function(blob) {
                     let formData = new FormData();
@@ -209,9 +210,10 @@
             handleFileChange (event) {
                 this.loading = true;
                 this.cancelShiBie = true;
+                this.websocketFun();
                 let file = event.target.files[0];
                 let formData = new FormData();
-                formData.append("file",file);
+                formData.append("file",file,"file.wav");
                 this.uploadFiles(formData);
             },
             //上传录音文件并识别
@@ -223,7 +225,7 @@
                     contentType: false,
                     data: formData,
                     success : function(data) {
-                        vm.websocketFun(data.sid);
+                        console.log("上传成功");
                     },
                     error : function(err) {
                         vm.$message.error('录音文件上传失败');
@@ -235,10 +237,12 @@
                     }
                 })
             },
-            websocketFun(sid){
+            websocketFun(){
                 let that = this;
+                let time = new Date().getTime();
+                console.log(time);
                 if(window.WebSocket) {
-                    this.websocket = new WebSocket('ws://127.0.0.1:52220/ws/'+sid);
+                    this.websocket = new WebSocket('ws://127.0.0.1:52220/ws/'+time);
                     this.websocket.onopen = function(e){
                         console.log("连接服务器成功");
                     }
