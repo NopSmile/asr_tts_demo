@@ -1,11 +1,14 @@
 package com.tx.filedown.common.utils;
 
+import java.util.HashMap;
+
 /**
  * 根据github项目中，您必须将lockAtMostFor设置为比正常执行时间长得多的值。这个时间小于轮训时间
  * 否则会出问题
  * @author whoami
  */
 public class Constant {
+    public static MaxSizeHashMap<String,String> asrmap = new MaxSizeHashMap<>(100);
     /**
      * 科大新接口
      */
@@ -23,7 +26,7 @@ public class Constant {
     //转科大写音频回调地址
 
 
-    public static String NOTISTIFYURL="http://192.168.102.215:52220/ist/callback";
-    public static final String asrurl="http://192.168.102.215:52220/asr/";
-    public static final String ttsurl="http://192.168.102.215:52220/tts/";
+    public static String NOTISTIFYURL="http://172.31.202.41:52220/ist/callback";
+    public static final String asrurl="http://172.31.202.41:52220/asr/";
+    public static final String ttsurl="https://172.31.202.41:52118/tts/";
 }

@@ -79,6 +79,7 @@ public class CallbackController {
 
         try {
             if(!"".equals(resultBuff.toString())){
+                Constant.asrmap.put(resp.getId(),resultBuff.toString());
                 WebSocketServer.sendInfo(resultBuff.toString(),resp.getId());
             }else{
                 WebSocketServer.sendInfo("ERROR",resp.getId());
