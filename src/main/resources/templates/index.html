@@ -189,11 +189,12 @@
                 this.disabledStopBtn = true;
                 this.loading = true;
                 this.cancelShiBie = true;
-                this.websocketFun();
+                let time = new Date().getTime();
+                this.websocketFun(time);
                 vm.recorder && vm.recorder.stop();
                 vm.recorder && vm.recorder.exportWAV(function(blob) {
                     let formData = new FormData();
-                    formData.append("file", blob,"file.wav");
+                    formData.append("file", blob, time);
                     vm.uploadFiles(formData);
                 });
                 vm.recorder.clear();
@@ -210,10 +211,11 @@
             handleFileChange (event) {
                 this.loading = true;
                 this.cancelShiBie = true;
-                this.websocketFun();
+                let time = new Date().getTime();
+                this.websocketFun(time);
                 let file = event.target.files[0];
                 let formData = new FormData();
-                formData.append("file",file,"file.wav");
+                formData.append("file",file, time);
                 this.uploadFiles(formData);
             },
             //上传录音文件并识别
@@ -237,10 +239,8 @@
                     }
                 })
             },
-            websocketFun(){
+            websocketFun(time){
                 let that = this;
-                let time = new Date().getTime();
-                console.log(time);
                 if(window.WebSocket) {
                     this.websocket = new WebSocket('ws://127.0.0.1:52220/ws/'+time);
                     this.websocket.onopen = function(e){
