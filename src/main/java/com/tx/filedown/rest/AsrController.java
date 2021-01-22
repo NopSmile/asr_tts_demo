@@ -35,7 +35,8 @@ public class AsrController {
     @PostMapping("/upload")
     public MapRestResponse uploading(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws UnknownHostException {
 
-        String filename= UUID.randomUUID().toString().replaceAll("-","")+file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."),file.getOriginalFilename().length());
+        //String filename= UUID.randomUUID().toString().replaceAll("-","")+file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."),file.getOriginalFilename().length());
+        String filename=file.getOriginalFilename();
         String afterType=file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1,file.getOriginalFilename().length());
         try {
             uploadFile(file.getBytes(), filePath, filename);

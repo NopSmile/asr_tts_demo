@@ -78,7 +78,11 @@ public class CallbackController {
         FileUtil.filechaseWrite(resultBuff.toString() + "\n", fileName);
 
         try {
-            WebSocketServer.sendInfo(resultBuff.toString(),resp.getId());
+            if(!"".equals(resultBuff.toString())){
+                WebSocketServer.sendInfo(resultBuff.toString(),resp.getId());
+            }else{
+                WebSocketServer.sendInfo("ERROR",resp.getId());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

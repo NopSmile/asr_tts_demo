@@ -242,7 +242,11 @@
             websocketFun(time){
                 let that = this;
                 if(window.WebSocket) {
-                    this.websocket = new WebSocket('ws://127.0.0.1:52220/ws/'+time);
+                    console.log(location.protocol);
+                    let protocol = location.protocol === 'https:'
+                        ? 'wss://172.31.202.41:52118/ws/'+time
+                        : 'ws://172.31.202.41:52220/ws/'+time;
+                    this.websocket = new WebSocket(protocol);
                     this.websocket.onopen = function(e){
                         console.log("连接服务器成功");
                     }

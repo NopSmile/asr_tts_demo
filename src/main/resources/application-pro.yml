@@ -26,9 +26,21 @@ spring:
     suffix: .html # 试图后的后缀
 #test
 
-server:
+http:
   port: 52220
 
+
+server:
+  port: 52118
+  ssl:
+    protocol: TLS
+    key-store: classpath:javastack.keystore
+    key-store-password: 123456
+    key-store-type: JKS
+    key-alias: tomcat
+    key-password: 123456
+#keytool -genkeypair -alias tomcat -keyalg RSA -keystore D:\javastack.keystore
+#keytool -export -alias tomcat -keystore D:\javastack.keystore -storepass 123456 -file D:\javastack.crt
 file:
   upload:
     #path: /home/asrdata/

@@ -21,12 +21,12 @@ public class Constant {
      public static String ISTURL = "http://172.16.12.38:5583/tuling/asr/v21/ist/async/process";
     //  public static String ISTURL = "http://192.168.60.76:33721/tuling/asr/v21/ist/async/process";
     //转科大写音频回调地址
-     public static String NOTISTIFYURL="http://192.168.102.215:52220/ist/callback";
+     public static String NOTISTIFYURL="http://172.31.202.41:52220/ist/callback";
     //  public static String NOTISTIFYURL="http://192.168.60.79:52220/ist/callback";
 
 
-    public static final String asrurl="http://192.168.102.215:52220/asr/";
-    public static final String ttsurl="http://192.168.102.215:52220/tts/";
+    public static final String asrurl="http://172.31.202.41:52220/asr/";
+    public static final String ttsurl="http://172.31.202.41:52220/tts/";
 
 
     public static String LASTRESULT="";
