@@ -287,7 +287,7 @@
                                     vm.cancelShiBieEvent();
                                     clearInterval(t);
                                 }
-                            },function (err) {
+                            }).error(function(){
                                 vm.$message.error('录音文件识别失败');
                                 vm.cancelShiBieEvent();
                                 clearInterval(t);
