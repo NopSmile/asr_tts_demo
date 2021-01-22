@@ -213,14 +213,14 @@
                     return;
                 };
                 this.rec.stop(function(blob,duration){
-                    console.log('4444',blob);
                     let formData = new FormData();
                     formData.append("file", blob, time);
                     vm.uploadFiles(formData);
+                    vm.rec.close();
                 },function(msg){
                     this.$message.error("录音失败:"+msg);
+                    vm.rec.close();//关闭录音
                 });
-                this.rec.close();//关闭录音
             },
             //取消识别文件
             cancelShiBieEvent(){
