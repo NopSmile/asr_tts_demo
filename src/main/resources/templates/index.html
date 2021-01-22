@@ -20,7 +20,7 @@
         <div class="left-box box">
             <div class="box-title">语音录入</div>
             <div class="box-cont">
-                <el-button class="record-btn" @click="startRecording" v-if="!showRecordBtn">开始录音</el-button>
+                <el-button class="record-btn" @click="recOpen" v-if="!showRecordBtn">开始录音</el-button>
                 <el-button class="record-btn" @click="stopRecording" :disabled="disabledStopBtn" v-if="showRecordBtn">停止录音</el-button>
                 <form enctype='multipart/form-data' v-if="!cancelShiBie">
                     <div class="box-input-div">
@@ -108,11 +108,10 @@
         </div>
     </div>
 </div>
-</body>
 <script src="js/vue.js"></script>
 <script src="js/element.js"></script>
 <script src="js/jquery.min.js"></script>
-<script src="js/recorder.js"></script>
+<script src="js/recorder.mp3.min.js"></script>
 <script>
     var vm = new Vue({
         el: '#app',
@@ -167,23 +166,41 @@
             websocket:{},
             audio_context:{},
             recorder:{},
+            rec:{},
             timer:''
         },
         methods: {
+            //请求权限，打开录音
+            recOpen(success){
+                let that = this;
+                let newRec = Recorder({type:"mp3",sampleRate:16000,bitRate:16});
+                newRec.open(function () {
+                    console.log("麦克风已启用");
+                    that.rec = newRec;
+                    that.startRecording();
+                },function(msg,isUserNotAllow){
+                    console.log("用户拒接使用麦克风，或不支持使用")
+                })
+            },
+            //开始录音
             startRecording(){
                 this.showRecordBtn = true;
                 let that = this;
-                vm.recorder && vm.recorder.record();
                 let maxtime = 15;//按秒计算
+                if(this.rec&&Recorder.IsOpen()){
+                    this.rec.start();
+                }else{
+                    this.$message.error("未打开录音");
+                };
                 this.timer = setInterval(function () {
                     if(maxtime >= 0){
                         --maxtime;
                     }else{
-                        clearInterval(that.timer);
                         that.stopRecording();
                     }
                 }, 1000);
             },
+            //结束录音
             stopRecording(){
                 clearInterval(this.timer);
                 this.disabledStopBtn = true;
@@ -191,13 +208,19 @@
                 this.cancelShiBie = true;
                 let time = new Date().getTime();
                 this.websocketFun(time);
-                vm.recorder && vm.recorder.stop();
-                vm.recorder && vm.recorder.exportWAV(function(blob) {
+                if(!(this.rec&&Recorder.IsOpen())){
+                    this.$message.error("未打开录音");
+                    return;
+                };
+                this.rec.stop(function(blob,duration){
+                    console.log('4444',blob);
                     let formData = new FormData();
                     formData.append("file", blob, time);
                     vm.uploadFiles(formData);
+                },function(msg){
+                    this.$message.error("录音失败:"+msg);
                 });
-                vm.recorder.clear();
+                this.rec.close();//关闭录音
             },
             //取消识别文件
             cancelShiBieEvent(){
@@ -244,8 +267,8 @@
                 if(window.WebSocket) {
                     console.log(location.protocol);
                     let protocol = location.protocol === 'https:'
-                        ? 'wss://172.31.202.41:52118/ws/'+time
-                        : 'ws://172.31.202.41:52220/ws/'+time;
+                        ? 'wss://192.168.102.215:52118/ws/'+time
+                        : 'ws://192.168.102.215:52220/ws/'+time;
                     this.websocket = new WebSocket(protocol);
                     this.websocket.onopen = function(e){
                         console.log("连接服务器成功");
@@ -341,23 +364,11 @@
             },
         }
     });
-    window.onload = function init() {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        vm.audio_context = new AudioContext;
-        navigator.mediaDevices.getUserMedia({audio: true})
-        .then(function(stream) {
-            console.log("可以使用麦克风");
-            let input = vm.audio_context.createMediaStreamSource(stream);
-            vm.recorder = new Recorder(input);
-        })
-        .catch(function(err) {
-            console.log('拒接使用麦克风');
-        });
-    };
     function checkField(){
         vm.showAudioBtn = false;
         vm.audioUrl = '';
         vm.audioBtn = "";
     };
 </script>
+</body>
 </html>

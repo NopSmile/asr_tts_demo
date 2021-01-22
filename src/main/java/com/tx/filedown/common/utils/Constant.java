@@ -23,7 +23,7 @@ public class Constant {
     //转科大写音频回调地址
 
 
-    public static String NOTISTIFYURL="http://172.31.202.41:52220/ist/callback";
-    public static final String asrurl="http://172.31.202.41:52220/asr/";
-    public static final String ttsurl="http://172.31.202.41:52220/tts/";
+    public static String NOTISTIFYURL="http://192.168.102.215:52220/ist/callback";
+    public static final String asrurl="http://192.168.102.215:52220/asr/";
+    public static final String ttsurl="http://192.168.102.215:52220/tts/";
 }
