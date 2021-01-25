@@ -62,7 +62,7 @@
         <div class="box">
             <div class="box-title">示例文本</div>
             <div class="box-cont">
-                <textarea class="box-text" v-model="inputText" maxlength="300" onchange="checkField()"  placeholder="请输入文字"></textarea>
+                <textarea class="box-text" v-model="inputText" maxlength="300" @change="checkField()"  placeholder="请输入文字"></textarea>
                 <p class="box-tip2">最多可输入<span>300</span>个字，超出部分合成将被截断</p>
             </div>
         </div>
@@ -100,7 +100,7 @@
                 <div class="btn-box">
                     <div class="btn" @click="lijihecheng" v-if="!showAudioBtn">立即合成</div>
                     <div v-cloak class="btn" @click="audioEvent"  v-if="showAudioBtn">
-                        <span>{{audioBtn}}</span>
+                        <span><i :class="audioBtnIcon" style="margin-right:3px"></i>{{audioBtn}}</span>
                         <audio id="audioId" @ended="audioEnded()" autoplay="autoplay" :src="audioUrl"></audio>
                     </div>
                 </div>
@@ -123,6 +123,7 @@
             cancelShiBie:false,//取消识别按钮
             outText:'',//音频识别结果
             inputText:'为了减少您的损失，请您今天晚上6点前尽快处理好本次欠款，好吧？',//输入合成音频文本
+            audioBtnIcon:"",
             audioBtn:'',
             value1:20,
             value2:50,
@@ -264,8 +265,8 @@
                 if(window.WebSocket) {
                     console.log(location.protocol);
                     let protocol = location.protocol === 'https:'
-                        ? 'wss://172.31.202.41:52118/ws/'+time
-                        : 'ws://172.31.202.41:52220/ws/'+time;
+                        ? 'wss://192.168.102.215:52118/ws/'+time
+                        : 'ws://192.168.102.215:52220/ws/'+time;
                     this.websocket = new WebSocket(protocol);
                     this.websocket.onopen = function(e){
                         console.log("连接服务器成功");
@@ -302,15 +303,15 @@
             choseItem(item){
                 this.sceneActive = item.cont;
                 this.sceneName = item.sceneName;
-                checkField();
+                this.checkField();
             },
             yinliangChange(val){
                 this.yinliang = Number(val-20);
-                checkField();
+                this.checkField();
             },
             yusuChange(val){
                 this.yusu = Number((val-50)*10);
-                checkField();
+                this.checkField();
             },
             formatTooltip1(val){
                 if(val == 20){
@@ -328,6 +329,7 @@
             lijihecheng(){
                 this.showAudioBtn = true;
                 this.audioBtn = "加载中";
+                this.audioBtnIcon = "el-icon-loading";
                 let data ={
                     voiceName: this.sceneName,
                     speed: this.yusu,
@@ -344,12 +346,12 @@
                         setTimeout(function(){
                             vm.audioUrl = data.audioUrl;
                             vm.audioBtn = "暂停";
+                            vm.audioBtnIcon = "el-icon-video-pause";
                         },5000);
                     },
                     error : function(err) {
                         vm.$message.error('音频合成失败');
-                        vm.showAudioBtn = false;
-                        vm.audioBtn = "";
+                        vm.checkField();
                     }
                 })
             },
@@ -358,24 +360,28 @@
                 let audio = document.getElementById('audioId');
                 if(audio.paused){
                     this.audioBtn = "暂停";
+                    this.audioBtnIcon = "el-icon-video-pause";
                     audio.play();
                     return;
                 }else{
                     this.audioBtn = "播放";
+                    this.audioBtnIcon = "el-icon-video-play";
                     audio.pause();
                 }
             },
             //播放结束回调
             audioEnded(){
                 this.audioBtn = "播放";
+                this.audioBtnIcon = "el-icon-video-play";
             },
+            checkField(){
+                vm.showAudioBtn = false;
+                vm.audioUrl = '';
+                vm.audioBtn = "";
+                vm.audioBtnIcon = "";
+            }
         }
     });
-    function checkField(){
-        vm.showAudioBtn = false;
-        vm.audioUrl = '';
-        vm.audioBtn = "";
-    };
 </script>
 </body>
 </html>
