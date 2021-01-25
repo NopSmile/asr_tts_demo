@@ -40,6 +40,7 @@ public class TtsController {
     @Resource
     private ExecutorService executorService;
 
+
     @PostMapping("/go")
     public MapRestResponse save(@RequestBody Map<String,Object> map){
 
@@ -83,6 +84,7 @@ public class TtsController {
 
     private static void saveResp(String body,String sid) throws IOException {
         FileOutputStream out = new FileOutputStream("D:\\data\\ttsdata\\"+sid+".wav");
+        //FileOutputStream out = new FileOutputStream("/root/asrttsdemo/ttsdata/"+sid+".wav");
         String[] resultList = body.split("\n");
         out.write(WavUtils.createAudio(16, body.length()).createWAVHeader());
         Gson gson = new Gson();
