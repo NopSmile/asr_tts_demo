@@ -43,7 +43,7 @@ server:
 #keytool -export -alias tomcat -keystore D:\javastack.keystore -storepass 123456 -file D:\javastack.crt
 file:
   upload:
-    #path: /home/asrdata/
+    #path: /root/asrttsdemo/asrdata/
     path: D:\data\asrdata\
 
 asr: 1
