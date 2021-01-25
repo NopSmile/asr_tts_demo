@@ -82,6 +82,7 @@ public class CallbackController {
                 Constant.asrmap.put(resp.getId(),resultBuff.toString());
                 WebSocketServer.sendInfo(resultBuff.toString(),resp.getId());
             }else{
+                Constant.asrmap.put(resp.getId(),"ERROR");
                 WebSocketServer.sendInfo("ERROR",resp.getId());
             }
         } catch (IOException e) {
